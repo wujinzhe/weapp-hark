@@ -1,0 +1,6 @@
+<!--index.wxml-->
+<view class="container">
+  <button bind:tap="asyncError">同步异常</button>
+  <button bind:tap="syncError">异步异常</button>
+  <button bind:tap="syncError">我的姓名</button>
+</view>

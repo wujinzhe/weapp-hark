@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+</body>
+<script>
+  window.onerror = function(event) {
+    console.log('event', event)
+
+
+  }
+
+  new Promise((resolve, reject) => {
+    // throw new Error('error')
+    resolve()
+  }).then(res => {
+    console.log('1')
+    throw new Error('error')
+  })
+
+  new Promise((resolve, reject) => {
+    resolve()
+  }).then(res => {
+    console.log('2')
+  })
+
+  setTimeout(() => {
+    // throw new Error('我错了')
+    // Promise.reject('我错了')
+    console.log(3)
+  }, 1000);
+</script>
+</html>
