@@ -1,15 +1,9 @@
 <!--index.wxml-->
 <view class="container">
   <view class="name">{{ store.name }}</view>
-  <!-- <button bind:tap="change">改变值</button> -->
-  <button bind:tap="change1">改变值</button>
+  <button bind:tap="change1">改变值1</button>
   <button bind:tap="confirm">确认改变</button>
-  <navigator url="/pages/test/index">
-    <button>切换页面1</button>
-  </navigator>
-  <navigator url="/pages/test1/index">
-    <button>切换页面2</button>
-  </navigator>
+
   <!-- <button bind:tap="asyncError">同步异常</button>
   <button bind:tap="syncError">异步异常</button>
   <button bind:tap="nameChange">改变姓名</button>

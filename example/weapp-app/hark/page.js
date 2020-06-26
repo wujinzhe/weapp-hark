@@ -24,6 +24,10 @@ function pageHook(params) {
   console.log('pageHook', params)
   const lifecylesHook = {
     onLoad: function (e) {
+      const data = {
+        route: this.route,
+        // name: 
+      }
       console.log('当前路由', this.route)
       console.log('onLoad', e)
     },

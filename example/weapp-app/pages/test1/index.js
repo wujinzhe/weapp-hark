@@ -20,8 +20,8 @@ Page({
   },
 
   onLoad: function (options) {
-    const draft = createCopy('x', store.store1)
-
+    const draft = createCopy('z', store.store1)
+    
     initStore(this, {
       store: draft
     })
@@ -30,14 +30,15 @@ Page({
   change1() {
     const { addressList } = this.data.store
     addressList.push({
-      address: 'yyy',
-      mobile: '1231222121',
-      name: '234213'
+      address: 'zzz',
+      mobile: 'fffffffffffffffff',
+      name: 'yy'
     })
     // const 
     this.setData({
       'store.name': (Math.random() * 100000).toFixed(0),
-      'store.addressList': addressList
+      'store.addressList': addressList,
+      'store.isBack': true
     })
 
   },

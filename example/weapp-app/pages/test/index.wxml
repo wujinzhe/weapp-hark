@@ -1,0 +1,4 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="name">{{ store.name }}</view>
+</view>
