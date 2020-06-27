@@ -1,7 +1,7 @@
 const EventHub = (function () {
   const eventList = {}
-  const onceEventList = {}
-  const coverEvent = {}
+  // const onceEventList = {}
+  // const coverEvent = {}
 
   function EventHub() {}
 
@@ -15,8 +15,6 @@ const EventHub = (function () {
         }
       })
     }
-
-    // if (onceEventli)
   }
 
   EventHub.prototype.$on = function $on(eventName, fn) {
@@ -25,6 +23,14 @@ const EventHub = (function () {
     }
 
     eventList[eventName].push(fn)
+  }
+
+  EventHub.prototype.$remove = function $remove(eventName, fn) {
+    if (!eventList[eventName]) {
+      eventList[eventName] = []
+    }
+
+    eventList[eventName] = eventList[eventName].filter(item => item !== fn)
   }
 
   return new EventHub()

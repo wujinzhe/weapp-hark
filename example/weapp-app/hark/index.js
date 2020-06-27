@@ -1,17 +1,16 @@
-require('./app')
 const pageHook = require('./page')
+const appHook = require('./app')
+const Event = require('./event')
+const componentHook = require('./component')
 const originApp = App
 const originPage = Page
+const originComponent = Component
 
-function encapsulation(params, type) {
-  console.log(params)
-  return params
-}
-
-App = (params) => originApp(encapsulation(params))
-Page = (params) => originPage(pageHook(params))
+// 直接赋值给全局的对象 就不需要导出了
+App = params => originApp(appHook(params))
+Page = params => originPage(pageHook(params))
+Component = params => originComponent(componentHook(params))
 
 module.exports = {
-  App,
-  Page
+  Event
 }

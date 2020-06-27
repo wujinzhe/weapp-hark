@@ -1,0 +1,7 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="name">我是组件页面</view>
+  <button bind:tap="error">抛出同步异常</button>
+  <button bind:tap="error1">promise异常</button>
+  <button bind:tap="customer">自定义上报</button>
+</view>

@@ -2,7 +2,7 @@
 //获取应用实例
 const app = getApp()
 const { produce } = getApp()
-const { store, initStore, createCopy, updateStore } = require('../../store/datasource')
+const { store, setStore, createCopy, updateStore } = require('../../store/datasource')
 
 
 
@@ -22,7 +22,7 @@ Page({
   onLoad: function (options) {
     const draft = createCopy('z', store.store1)
     
-    initStore(this, {
+    setStore(this, {
       store: draft
     })
   },
@@ -44,7 +44,7 @@ Page({
   },
 
   confirm() {
-    console.log('confirm', this.data.store)
+    // console.log('confirm', this.data.store)
     updateStore('store1', this.data.store)
   }
 })

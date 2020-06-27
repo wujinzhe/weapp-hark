@@ -1,7 +1,36 @@
 //app.js
-const { App } = require('./hark/index')
+require('./hark/index')
+require('./event')
 const { produce } = require('./immer.umd')
-require('./store/datasource')
+const { initStore } = require('./store/datasource')
+
+/** 初始化数据 */
+initStore({
+ store1: {
+    name: '111',
+    age: '111',
+    isBack: false,
+    server: {
+      fee: 0,
+    },
+    addressList: [
+      {
+        address: 'xxx',
+        name: 'xxx',
+        mobile: 'xxx'
+      }
+    ]
+  },
+  store2: {
+    number: '12312',
+    fee: '2131232'
+  },
+  store3: {
+    phone: '15219475158',
+    login: true
+  },
+})
+
 App({
   onLaunch: function () {
     // 展示本地存储能力

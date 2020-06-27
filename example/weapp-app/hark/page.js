@@ -1,69 +1,58 @@
-// class PageHook {
-//   constructor() {
+const Event = require('./event')
+const lifecylesHook = ['onLoad', 'onShow', 'onHide', 'onReady', 'onUnload']
+const utils = require('./utils')
 
-//   }
-
-//   onLoad() {
-
-//   }
-
-//   onShow() {
-
-//   }
-
-//   onReady() {
-
-//   }
-
-//   onHide() {
-
-//   }
-// }
+function Hook(scope, functionName, ...argv) {
+  if (lifecylesHook.indexOf(functionName) >= 0) {
+    // 说明为生命周期钩子
+    // console.log('page ', functionName, scope.route, ...argv)
+    Event.$emit('lifecycle', {
+      type: 'Page',
+      hookType: 'lifecycle',
+      route: scope.route,
+      scope,
+      eventName: functionName,
+      argv
+    })
+  } else if (argv[0].type === 'tap') {
+    // console.log('page 点击事件', functionName, ...argv)
+    Event.$emit('event', {
+      type: 'Page',
+      hookType: 'event',
+      eventType: 'tap',
+      route: scope.route,
+      scope,
+      eventName: functionName,
+      argv
+    })
+  }
+}
 
 function pageHook(params) {
-  console.log('pageHook', params)
-  const lifecylesHook = {
-    onLoad: function (e) {
-      const data = {
-        route: this.route,
-        // name: 
-      }
-      console.log('当前路由', this.route)
-      console.log('onLoad', e)
-    },
-  
-    onShow: () => {
-      console.log('onShow')
-    },
-  
-    onReady: () => {
-      console.log('onReady')
-    },
-  
-    onHide: () => {
-      console.log('onHide')
-    }
-  }
+  const _params = utils.supplement(params, lifecylesHook)
 
-  Object.keys(lifecylesHook).forEach(item => {
-    // console.log('item', item)
-    // console.log('this', this)
-    // if (params[item]) {
-      const originFun = params[item]
-      // const originFun = (...argv) => params[item](...argv)
+  const newParams = new Proxy(_params, {
+    get(target, prop, receiver) {
+      // console.log('get', prop, target.prop)
 
-      params[item] = function (...argv) {
-        // console.log('this', this)
-        lifecylesHook[item].call(this, ...argv)
+      if (typeof target[prop] === 'function') {
+        const fn = target[prop]
 
-        if (typeof originFun === 'function') {
-          originFun.call(this, ...argv)
+        return function(...argv) {
+          // console.log('this', this, argv, prop)
+          Hook(this, prop, ...argv) // 调用钩子中的事件
+          fn.call(this, ...argv) // 调用原函数
         }
+      } else {
+        return target[prop]
       }
-    // }
+    },
+    set(target, prop, value) {
+      target[prop] = value
+    }
   })
 
-  return params
+  return newParams
 }
 
 module.exports = pageHook

@@ -1,17 +1,21 @@
-const { event } = require('./hark/index')
+const { Event } = require('./hark/index')
 
-event.$on('lifecycle', data => {
+Event.$on('lifecycle', data => {
   // 任何的声明周期，包括app, page, component， 并且在data返回相应的其它属性
+  console.log('lifecycle', data)
 })
 
-event.$on('error', errInfo => {
+Event.$on('error', data => {
   // 在小程序中捕获的任意错误，包括同步的错误和promise的错误
+  console.log('error', data)
 })
 
-event.$on('event', e => {
+Event.$on('event', data => {
   // 在小程序中触发的所有的事件
+  console.log('event', data)
 })
 
-event.$on('customer', value => {
+Event.$on('customer', data => {
+  console.log('customer', data)
   // 在小程序内自定义触发的一些事件
 })

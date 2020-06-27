@@ -10,6 +10,9 @@
   <navigator url="/pages/test1/index">
     <button>切换页面2</button>
   </navigator>
+  <navigator url="/pages/comPage/index">
+    <button>组件页面</button>
+  </navigator>
   <!-- <button bind:tap="asyncError">同步异常</button>
   <button bind:tap="syncError">异步异常</button>
   <button bind:tap="nameChange">改变姓名</button>

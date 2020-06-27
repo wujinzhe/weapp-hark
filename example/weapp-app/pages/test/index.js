@@ -1,5 +1,5 @@
 
-const { store, initStore, createCopy, updateStore } = require('../../store/datasource')
+const { store, setStore, createCopy, updateStore } = require('../../store/datasource')
 
 // const draft = createCopy('y', store.store1)
 Page({
@@ -16,7 +16,7 @@ Page({
    */
   onLoad: function (options) {
     console.log('store', store)
-    initStore(this, {
+    setStore(this, {
       store: createCopy('y', store.store1)
     })
   },

@@ -2,32 +2,15 @@ const { produce, createDraft, finishDraft } = require('../immer.umd')
 const EventHub = require('./event')
 
 const datasource = {
-  store1: {
-    name: '111',
-    age: '111',
-    isBack: false,
-    server: {
-      fee: 0,
-    },
-    addressList: [
-      {
-        address: 'xxx',
-        name: 'xxx',
-        mobile: 'xxx'
-      }
-    ]
-  },
-  store2: {
-    number: '12312',
-    fee: '2131232'
-  },
-  store3: {
-    phone: '15219475158',
-    login: true
-  },
   // 草稿
   draft: {
   }
+}
+
+function initStore(data) {
+  Object.keys(data).forEach(item => {
+    datasource[item] = data[item]
+  })
 }
 
 /** 获取对象的路径，访问路径 */
@@ -52,34 +35,33 @@ function _getDataPath(data) {
 }
 
 /** 判断这个副本的名称是否存在 */
-function isPathExist(copyName) {
+function _isPathExist(copyName) {
   // TODO 是否存在改副本
+  const copyNameList = Object.keys(datasource.draft)
+
+  return copyNameList.indexOf(copyName) >= 0
 }
 
 /**
  * 创建一个副本
  * @param {String} copyName 副本名称
  * @param {*} data 想要拷贝的对象，一定要是数据的第一层级
+ * @param {Boolean} isRewrite 是否覆盖
  */
-function createCopy(copyName, data) {
+function createCopy(copyName, data, isRewrite) {
   /**
    * 该函数在使用的时候，应该明确调用，因为我们需要明确自己是根据那个对象来进行创建副本的，并且
    * 需要知道我们创建的副本叫什么名称，这样我们的副本可以被再次引用，继续创建副本的副本，然后副本的副本的副本，
    * 只要有一个引用了原数据的副本改变，那基于这个数据复制的副本也要跟着改变，这个就是这个数据驱动的基本思想
    */
   const draft = createDraft(data)
-  // draft.name =1
-  // const nextDraft = finishDraft(draft)
-  // console.log(data, nextDraft, data === nextDraft)
   const path = _getDataPath(data) // 可以访问到的路径
 
-  // if (datasource.draft[copyName]) {
-  //   finishDraft(datasource.draft[copyName])
-  // }
+  if (!isRewrite && _isPathExist(copyName)) {
+    throw new Error('已经存在相同名称的草稿')
+  }
 
   datasource.draft[copyName] = draft
-
-  console.log('createCopy', draft)
 
   return {
     copyName,
@@ -93,11 +75,13 @@ function createCopy(copyName, data) {
  * @param {Object} currentScope 当前执行的作用域的this
  * @param {Object} data 
  */
-function initStore(currentScope, data) {
-  // console.log()
-  console.log('initStore data', data)
+function setStore(currentScope, data) {
+  /**
+   * 在初始化的时候需要给这个组件或者页面进行赋值
+   */
   const newData = {}
   const eventList = [] // 有多少需要监听的对象
+  currentScope.eventList = []
 
   Object.keys(data).forEach(item => {
     newData[item] = data[item].data
@@ -112,57 +96,67 @@ function initStore(currentScope, data) {
   eventList.forEach(item => {
     const { path, copyName, dataName } = item
 
+    function event (value) {
+      // console.log('value', currentScope.route, value, path)
+      const copyData = createCopy(copyName, value, true)
+
+      currentScope.setData({
+        [dataName]: copyData.data
+      })
+    }
+
+    currentScope.eventList.push({
+      path,
+      copyName,
+      event
+    })
+
     // 进行监听
-    EventHub.$on(path, function (value) {
-      console.log('value', value, path)
-      const copyData = createCopy(copyName, value)
-
-      console.log('eventhub path', dataName, copyData.data)
-
-      
-      try {
-        // JSON.stringify(copyData.data)
-        console.log('eventhub currentScope', this)
-        // console.log('get', copyData.data.name)
-        // debugger
-        this.setData({
-          [dataName]: copyData.data
-        })
-      } catch(e) {
-        console.log('e', this.route, e)
-      }
-    }.bind(currentScope))
+    EventHub.$on(path, event)
   })
 
-  console.log('currentScope', currentScope)
+  _rewriteOnUnload(currentScope)
 
   currentScope.setData({
-    // store: {
-    //   name: 1,
-    //   age: 1
-    // }
     ...newData
   })
 }
 
+/** 对卸载事件进行重写 */
+function _rewriteOnUnload(currentScope) {
+  const fn = currentScope.onUnload.bind(currentScope)
+  const { eventList } = currentScope
 
+  currentScope.onUnload = function() {
+    // 移除事件与草稿
+    eventList.forEach(item => {
+      EventHub.$remove(item.path, item.event)
+      delete datasource.draft[item.copyName]
+    })
+
+    fn()
+  }
+}
+
+/** 更新数据 */
 function updateStore(path, data) {
-  // if (path)
+  const newData = { ...data }
 
-  const newData = data
-  // const newData = finishDraft(data)
-  console.log('data', {...newData})
-  datasource[path] = newData
+  if (/\./g.test(path)) {
+    const [name1, name2] = path.split('.')
 
-  console.log('updateStore', datasource)
+    datasource[name1][name2] = newData
+  } else {
+    datasource[path] = newData
+  }
 
   EventHub.$emit(path, newData)
 }
-// createCopy('xx', datasource.store1)
 
 module.exports = {
   store: datasource,
   createCopy,
+  setStore,
   initStore,
   updateStore
 }
