@@ -6,7 +6,7 @@ const fullErrorFunctionList = ['onError', 'onUnhandledRejection']
 const BaseHook = require('./BaseHook')
 const originApp = App
 
-Proxy.prototype = new BaseHook() // 只继承原型链中的方法即可
+AppHook.prototype = new BaseHook() // 只继承原型链中的方法即可
 
 function AppHook(params) {
   // this.$options = supplement(params, fullLifecylesFunctionList.concat(...fullErrorFunctionList))
@@ -17,6 +17,7 @@ function AppHook(params) {
       type: 'lifecylesHook',
       list: fullLifecylesFunctionList,
       handle(scope, eventName, argvs) {
+        console.log('eventName app', eventName)
         this.Event.$emit('lifecylesHook', {
           type: 'App',
           hookType: 'lifecylesHook',
@@ -43,13 +44,14 @@ function AppHook(params) {
 
   this.$hookEvent = toHookObject(this.$options, this.$hooks)
 
-  return proxyParams(this.$options, (scope, eventName, argvs) => {
+
+  this.getProxyParams = () => proxyParams(this.$options, (scope, eventName, argvs) => {
     // scope 获取的是页面的当前实例
-    console.log('scope', scope)
-    console.log('eventName', eventName)
-    console.log('argvs', argvs)
-    console.log('this', this.$hookEvent, this.$hookEvent[eventName])
-    this.$hookEvent[eventName].bind(this, scope, eventName, argvs)
+    // console.log('scope', scope)
+    // console.log('eventName', eventName)
+    // console.log('argvs', argvs)
+    // console.log('this', this.$hookEvent, this.$hookEvent[eventName])
+    this.$hookEvent[eventName].bind(this, scope, eventName, argvs)()
   })
 }
 
@@ -57,10 +59,9 @@ function AppHook(params) {
 const initApp = (hooks = []) => {
   return (params) => {
     const appHook = new AppHook(params)
-    console.log('appHook', appHook)
     
     appHook.setHook(hooks)
-    originApp(appHook)
+    originApp(appHook.getProxyParams())
   }
 }
 

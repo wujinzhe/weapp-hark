@@ -9,7 +9,6 @@ PageHook.prototype = new BaseHook() // 原型链继承
 
 function PageHook(params) {
   this.$options = params
-  // this.$options = supplement(params, fullLifecylesFunctionList)
   this.Event = Event
   this.$hooks = [
     {
@@ -27,7 +26,7 @@ function PageHook(params) {
     },
     {
       type: 'eventHook',
-      list: ['event'],
+      list: ['$event'],
       handle(scope, eventName, argvs) {
         this.Event.$emit('eventHook', {
           type: 'Page',
@@ -42,29 +41,21 @@ function PageHook(params) {
 
   this.$hookEvent = toHookObject(this.$options, this.$hooks)
 
-  return proxyParams(this.$options, (scope, eventName, argvs) => {
-    // scope 获取的是页面的当前实例
-    console.log('scope', scope)
-    console.log('eventName', eventName)
-    console.log('argvs', argvs)
-    this.$hookEvent[eventName].bind(this, scope, eventName, argvs)
+  this.getProxyParams = () => proxyParams(this.$options, (scope, eventName, argvs) => {
+    if (argvs[0] && argvs[0].type === 'tap') {
+      this.$hookEvent.$event.bind(this, scope, eventName, argvs)()
+    } else {
+      this.$hookEvent[eventName].bind(this, scope, eventName, argvs)()
+    }
   })
 }
-
-/** 可以自己根据声明周期或者函数自己添加钩子 */
-// PageHook.prototype.setHook = function setHook(hook) {
-//   // if (hook.get)
-//   this.$hooks.push(hook)
-
-//   this.$hookEvent = toHookObject(this.$hooks)
-// }
 
 const initPage = (hooks = []) => {
   return (params) => {
     const pageHook = new PageHook(params)
     
     pageHook.setHook(hooks)
-    originPage(pageHook)
+    originPage(pageHook.getProxyParams())
   }
 }
 

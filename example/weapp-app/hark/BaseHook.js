@@ -1,27 +1,7 @@
-const { error } = require('./utils')
+const { error, toHookObject } = require('./utils')
 
 function BaseHook() {
   // this.$hooks = []
-}
-
-BaseHook.prototype.toHookObject = function toHookObject(hookList = []) {
-  if (!Array.isArray(hookList)) {
-    error('toHookObject的参数必须为数组')
-  }
-
-  const list = []
-
-  hookList.forEach(item => {
-    item.list.forEach(i => {
-      if (typeof this.$options[i] !== 'function') {
-        this.$options[i] = () => {}
-      }
-      
-      list[i] = item.handle
-    })
-  })
-
-  return list
 }
 
 BaseHook.prototype.setHook = function setHook(hookList = []) {
@@ -30,7 +10,7 @@ BaseHook.prototype.setHook = function setHook(hookList = []) {
   }
 
   this.$hooks.push(...hookList)
-  this.$hookEvent = this.toHookObject(this.$hooks)
+  this.$hookEvent = toHookObject(this.$options, this.$hooks)
 }
 
 module.exports = BaseHook

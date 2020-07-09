@@ -19,8 +19,8 @@ module.exports = {
           const fn = target[prop]
   
           return function(...argv) {
-            Hook(this, prop, ...argv) // 将该事件抛出去，并且查找相对应钩子调用
-            fn.call(this, ...argv) // 调用原函数
+            Hook(this, prop, argv) // 将该事件抛出去，并且查找相对应钩子调用
+            fn.call(this, argv) // 调用原函数
           }
         } else {
           return target[prop]

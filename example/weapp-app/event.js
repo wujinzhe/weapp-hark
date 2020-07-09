@@ -10,9 +10,9 @@ Event.$on('errorHook', data => {
   console.log('errorHook', data)
 })
 
-Event.$on('event', data => {
+Event.$on('eventHook', data => {
   // 在小程序中触发的所有的事件
-  console.log('event', data)
+  console.log('eventHook', data)
 })
 
 Event.$on('customer', data => {

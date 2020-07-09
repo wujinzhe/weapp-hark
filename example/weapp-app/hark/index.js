@@ -21,7 +21,20 @@ const { initApp } = require('./AppHook')
 const { initPage } = require('./PageHook')
 
 App = initApp() // 可以设置钩子
-Page = initPage()
+Page = initPage([
+  {
+    type: 'share',
+    list: ['onShareAppMessage'],
+    handle(scope, eventName, argvs) {
+      this.Event.$emit('share', {
+        data: '我分享啦哈哈哈',
+        argvs,
+        eventName,
+        scope
+      })
+    }
+  }
+])
 
 // console.log('pageHook', pageHook)
 // pageHook.setHook({
