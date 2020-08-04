@@ -3,14 +3,29 @@ const EventHub = require('./event')
 
 const datasource = {
   // 草稿
-  draft: {
-  }
 }
+
+/** 添加草稿对象draft */
+Object.defineProperties(datasource, {
+  "draft": {
+    enumerable: false,
+    configurable: true,
+    value: {},
+    writable: true
+  }
+})
 
 function initStore(data) {
   Object.keys(data).forEach(item => {
     datasource[item] = data[item]
   })
+}
+
+/**
+ * 根据symbol查找草稿对象
+ */
+function _getDraft(symbol) {
+
 }
 
 /** 获取对象的路径，访问路径 */
@@ -43,12 +58,12 @@ function _isPathExist(copyName) {
 }
 
 /**
- * 创建一个副本
+ * 创建一个副本/草稿
  * @param {String} copyName 副本名称
  * @param {*} data 想要拷贝的对象，一定要是数据的第一层级
  * @param {Boolean} isRewrite 是否覆盖
  */
-function createCopy(copyName, data, isRewrite) {
+function createClone(copyName, data, isRewrite) {
   /**
    * 该函数在使用的时候，应该明确调用，因为我们需要明确自己是根据那个对象来进行创建副本的，并且
    * 需要知道我们创建的副本叫什么名称，这样我们的副本可以被再次引用，继续创建副本的副本，然后副本的副本的副本，
@@ -98,7 +113,7 @@ function setStore(currentScope, data) {
 
     function event (value) {
       // console.log('value', currentScope.route, value, path)
-      const copyData = createCopy(copyName, value, true)
+      const copyData = createClone(copyName, value, true)
 
       currentScope.setData({
         [dataName]: copyData.data
@@ -155,7 +170,7 @@ function updateStore(path, data) {
 
 module.exports = {
   store: datasource,
-  createCopy,
+  createClone,
   setStore,
   initStore,
   updateStore
